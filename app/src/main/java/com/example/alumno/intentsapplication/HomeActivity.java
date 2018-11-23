@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 public class HomeActivity extends AppCompatActivity {
 
+    final static int FAVORITO_ELEGIDO = 0;
     WebView pageView;
     EditText pageText;
     @Override
@@ -26,11 +27,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void verFavoritos(View v){
-        Intent miIntent = new Intent(HomeActivity.this, FavoritosActivity.class);
-        miIntent.putExtra("nombre", "Juan Perez");
-        miIntent.putExtra("edad", 30);
-        //startActivity(miIntent);
-        startActivityForResult(miIntent, );
+        Intent favoritosIntent = new Intent(HomeActivity.this, FavoritosActivity.class);
+        startActivityForResult(favoritosIntent, FAVORITO_ELEGIDO);
     }
 
     public void agregarFavorito(View v){
@@ -67,7 +65,6 @@ public class HomeActivity extends AppCompatActivity {
 
     public void verPagina(View v){
         String url = pageText.getText().toString();
-        //Toast.makeText(this, url, Toast.LENGTH_SHORT).show();
         pageView.loadUrl(url);
         pageView.setWebViewClient(new WebViewClient() {
             @Override
@@ -85,5 +82,19 @@ public class HomeActivity extends AppCompatActivity {
         Favoritos favorito = new Favoritos(nombreFavorito,URL);
         favorito.save();
         Toast.makeText(this, "Has agregado exitosamente el favorito: " + nombreFavorito, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(resultCode == RESULT_OK)
+        {
+            String url = data.getExtras().getString("FAVORITO_ELEGIDO");
+
+            if(requestCode == FAVORITO_ELEGIDO)
+                pageText.setText(url);
+
+            verPagina(pageView);
+        }
     }
 }

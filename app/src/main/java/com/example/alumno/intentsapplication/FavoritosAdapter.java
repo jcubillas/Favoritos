@@ -36,7 +36,7 @@ public class FavoritosAdapter extends ArrayAdapter<Favoritos> {
         nombreItem.setText(favorito.getNombre());
         URLItem.setText(favorito.getUrl());
 
-        return (favorito_item);
+        return favorito_item;
     }
 
 }

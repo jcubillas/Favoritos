@@ -14,40 +14,51 @@ import java.util.List;
 
 public class FavoritosActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
+    List<Favoritos> favoritos;
     TextView text;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
 
-        //Busco a todos los favoritos de la base de datos.
-        List<Favoritos> favoritos = Favoritos.listAll(Favoritos.class);
+        favoritos = Favoritos.listAll(Favoritos.class);
 
-        FavoritosAdapter adaptador = new FavoritosAdapter(this, R.layout.favorito_item, favoritos);
-
-        ListView listaOpciones = (ListView)findViewById(R.id.listaDeFavoritos);
-
-        listaOpciones.setAdapter(adaptador);
-
-
-        listaOpciones.setOnItemClickListener(this);
+        generarLista();
     }
 
     @Override
     public void onItemClick(AdapterView<?> padre, View view, int posicion, long id) {
 
-        FavoritosAdapter adaptador = (FavoritosAdapter) padre.getAdapter();
+        FavoritosAdapter favoritoAdaptador = (FavoritosAdapter) padre.getAdapter();
 
-        Favoritos favorito_seleccionado = adaptador.getItem(posicion);
+        Favoritos favoritoElegido = favoritoAdaptador.getItem(posicion);
 
-        Toast.makeText(this, (CharSequence) favorito_seleccionado, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, (CharSequence) favoritoElegido, Toast.LENGTH_SHORT).show();
 
+        Intent favoritosIntent = getIntent();
+        favoritosIntent.putExtra("FAVORITO_ELEGIDO", favoritoElegido.getUrl());
 
-        /*Intent miIntent = getIntent();
-        miIntent.putExtra("FAVORITO_ELEGIDO", favorito_elegido.getUrl());
-
-        setResult(RESULT_OK, miIntent);
-        finish();*/
+        setResult(RESULT_OK, favoritosIntent);
+        finish();
     }
 
+    public void generarLista() {
+        FavoritosAdapter adaptador = new FavoritosAdapter(this, R.layout.favorito_item, favoritos);
+        ListView listaOpciones = findViewById(R.id.listaDeFavoritos);
+        listaOpciones.setAdapter(adaptador);
+        listaOpciones.setOnItemClickListener(this);
+    }
+    public void eliminarFavorito(View v){
+        View parentRow = (View) v.getParent();
+        ListView listView = (ListView) parentRow.getParent();
+
+        final int position = listView.getPositionForView(parentRow);
+
+        Favoritos favoritoElegido = favoritos.get(position);
+        favoritoElegido.delete();
+
+        favoritos = Favoritos.listAll(Favoritos.class);
+
+        generarLista();
+    }
 }
